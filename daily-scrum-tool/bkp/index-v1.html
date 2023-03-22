@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/estilo.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+    <title>Daily Scrum</title>
+    <link  rel="icon"   href="favicon.ico" />
+</head>
+<body class="bg">
+  
+  <div style="position: absolute;">
+   
+    <div id="menu">
+      
+    </div>
+    <div class="form-inline">
+      <div id="field_wrapper">
+        <div class="my-class-form-control-group">
+          <button type="menu" id="btnMenu" class="btn btn-default"><img src="./assets/images/addPerson.png" width="30px"></button>
+          <div id="divAgregar" style="display:none;">
+            <input type="text" class="form-control mr-2" name="txtName" id="txtName" onkeypress="pulsar(event)" placeholder="Agregar participante" autocomplete="off"/>
+            <button type="button" class="btn btn-primary" style="height:40px; display: none;" id="btnAgregar" >&#x2795;</button>
+          </div>
+          
+          <div>
+            <form name="myForm" id="myForm" style="display: none;">
+              <input name="myInput" class="form-control mr-2" type="file" autocomplete="off">
+            </form>
+          </div>
+          <button type="button" class="btn btn-default" style="height:40px; display: none;" id="btnExaminar">...</button>
+          
+        </div>
+       </div>
+       <br>
+    </div>
+    
+  </div>
+    <div id="containerExample">
+        <h1 style="text-align: center;">Daily Scrum</h1>
+        <p style="text-align: center;">Squad Los Trovadores Criollos
+        <p style="text-align: center;">
+          <button type="button" class="btn btn-success" style="height:40px;" id="btnIniciar" >Iniciar</button>
+          <button type="button" class="btn btn-danger" style="height:40px; display: none;" id="btnFinalizar">Finalizar</button>
+          <button type="button" class="btn btn-danger" style="height:40px; display: none;" data-bs-toggle="modal" data-bs-target="#exampleModal" id="btnFinalizarModal">Finalizar</button>
+        </p> 
+    </div>
+  
+    <div>
+      <p style="text-align: center;">
+        <button type="button" class="btn btn-secondary" style="display: none;" id="btnGirar">Sortear participante</button> 
+        <span id="timer" style="font-size: large; color:white; display: none;">3</span>
+        <span id="lblTiempoFinal" style="font-size:xx-large; color:white; display: none;"></span>
+      </p>
+    </div>
+
+    <div class="row">
+      <span style="text-align: center;"><img  id="spinner" height="50px" width="50px" style="display: none;" ></span>
+
+    </div>
+
+    <div id="panelSorteo" style="display: none;" class="scrum-board-sorteo bg-sorteo">  
+      <div class="board-sorteo">
+        <div id="container" class="row contenedor">
+        </div>         
+      </div>
+    </div>
+    <br>
+
+    <div class="row" id="panelScreenshot" style="display: none;">
+
+        <div class="col-6">
+          <div class="scrum-board">  
+            <div id="board" class="board">
+          
+              <div id="seleccion" class="col-6 seleccion">
+                <div id="divCounter" class="form-inline contenedor" style="display: none;">
+                  <div id="field_wrapper_clock" class="field_wrapper_clock">
+                    <div class="my-class-form-control-group">
+                      <span id="playtimer" style="font-size: xx-large; color:white;">00:00</span>&nbsp;&nbsp; 
+                      <button type="button" class="btn btn-success" id="btnPlayTimer" style="border-radius: 20px;">&#9658;</button>
+                      <button type="button" class="btn btn-danger" id="btnStopTimer" style="border-radius: 20px; display:none;" >&#9723</button>
+                    </div>
+                   </div>
+                </div>
+                 <!-- <p style="text-align: center; font-size: x-large;">Time box <img id="imagenCrono" src="./assets/images/crono1.png" width="20px"></img> -->   
+                <br>
+              </div>
+            </div>
+          </div>
+
+        </div>  
+
+        <div class="col-6">
+          <div class="tv">
+            <div class="screen">
+              <!-- Your screen content goes here -->
+              <video class="video frame" id="video" autoplay></video>
+              <img id="imagen" class="imagen"  alt="imagen" style="display: none;"></img>   
+            </div>
+           
+            <button id="clock-btn" ></button>
+          </div>
+        </div>
+     
+    </div>
+
+    
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Nuevo mensaje</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">Destinatario:</label>
+                <input type="text" class="form-control" id="recipient-name" autocomplete="off">
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label">Mensaje:</label>
+                <textarea class="form-control" id="message-text" autocomplete="off"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary">Enviar mensaje</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script src="js/script.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  </body>
+  
+</html>

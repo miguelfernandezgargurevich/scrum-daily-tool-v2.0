@@ -60,6 +60,7 @@ var timerInerval;
 var arrayTrovadores = []; 
 
 
+/*
 const wrapper = document.querySelector(".wrapper"),
     header = wrapper.querySelector("header");
 
@@ -80,7 +81,7 @@ document.addEventListener("mouseup", ()=>{
   header.classList.remove("active");
   header.removeEventListener("mousemove", onDrag);
 });
-
+*/
 
 function onChangeExaminar() {
   const file = this.files[0];
@@ -96,13 +97,51 @@ function onChangeExaminar() {
   }
 };
 
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+
+function searchSquad() {
+
+  document.getElementById("panelDropdown").style.display = '';
+
+  document.getElementById("myDropdown").classList.toggle("show");
+  document.getElementById("lblSquad").style.display = 'none';
+  document.getElementById("btnIniciar").style.display = 'none';
+  var myDropdown = document.getElementById("myDropdown");
+  myDropdown.style.marginLeft=(window.innerWidth/2)-170+"px";
+
+}
+
+function filterFunction() {
+  var input, filter, ul, li, a, i;
+  input = document.getElementById("myInputdropdown");
+  filter = input.value.toUpperCase();
+  div = document.getElementById("myDropdown");
+  a = div.getElementsByTagName("a");
+  for (i = 0; i < a.length; i++) {
+    txtValue = a[i].textContent || a[i].innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      a[i].style.display = "";
+    } else {
+      a[i].style.display = "none";
+    }
+  }
+}
+
+
+
 function loadPage(){ 
-  $("#scrumBoard").draggable();
-  $("#tvBoard").draggable();
+  $("#scrumBoard").draggable({ handle: "header" }); 
+  $("#tvBoard").draggable({ handle: "header" }); //tvBoard
   $("#panelSorteo").draggable({ handle: "header" });
   $("#divCounter").draggable();
   $("#panelMenu").draggable();
+  
+  $('.select2').select2({ width: '300px' });
+
   $(".files-tree").resizable();
+  $(".tvBoard").resizable();
+  $(".scrum-board").resizable()
   
 
   //disable page back
@@ -113,18 +152,43 @@ function loadPage(){
   });
   //
 
-  //console.log(squads[0].Trovadores);
-  var trovadores = squads[0].Trovadores;
-
-  for (x of trovadores) {
-    //console.log(x.nombre);
-    arrayTrovadores.push(x.nombre);
-  }
 
   var panelCalendario = document.getElementById("panelCalendario");
   panelCalendario.style.marginLeft = (window.innerWidth - 300)+"px";
 
+
+  for (x of squads.equipos) {
+    //console.log(x.nombre);
+    var data = {
+      id: x.nombre,
+      text: x.nombre
+    };
+
+    var newOption = new Option(data.text, data.id, false, false);
+    $('#mySelect2').append(newOption).trigger('change');
+
+  }
+  
+
 } 
+
+$('#mySelect2').on('select2:select', function (e) {
+  var data = e.params.data;
+  //(data);
+  //console.log($("#mySelect2").val())
+
+  btnIniciar.style.display = '';
+  var lblSquad = document.getElementById('lblSquad');
+  lblSquad.addEventListener('click', searchSquad);
+
+  lblSquad.style.display = '';
+  lblSquad.innerHTML = $("#mySelect2").val();
+
+
+  document.getElementById("panelDropdown").style.display = 'none';
+  $("#mySelect2").val("-Seleccionar-");
+
+});
 
 function obtenerDimensionesScreen(){
 
@@ -276,17 +340,51 @@ function finalizar(){
 
 function iniciar(){
   
+  var lblSquad = document.getElementById('lblSquad');
+  var valor = lblSquad.innerHTML;
+  
+  var mysquads = [];
+  for (var i=0;i<squads.equipos.length;i++) {
+    if (valor == squads.equipos[i].nombre)
+    {
+      mysquads = squads.equipos[i].miembros;
+      break;
+    }
+
+  }
+
+  if (mysquads.length == 0)
+  {
+      document.getElementById("textoModal").innerHTML = "Mensaje";        
+      document.getElementById("lblGanador").innerHTML = "Debe seleccionar un team para iniciar!";
+      document.getElementById("modalContent").style.backgroundImage = ""
+      $('#exampleModal').modal('show'); // abrir
+      return;
+
+  }
+
+
+  for (x of mysquads) {
+    //console.log(x.nombre);
+    arrayTrovadores.push(x.nombre);
+  }
+
+  for (var i=0;i<arrayTrovadores.length;i++){
+    addPersona(arrayTrovadores[i]);
+  }
+
   btnIniciar.style.display = 'none';
+  lblSquad.removeAttribute("onclick");
+  lblSquad.style.pointerEvents = 'none'; //to disable click
+
+  // To re-enable:
+  //document.getElementById('id').style.pointerEvents = 'auto'; 
 
   var panelSorteo = document.getElementById("panelSorteo"); 
   panelSorteo.style.marginLeft = "230px";
 
   
-  for (var i=0;i<arrayTrovadores.length;i++){
-    addPersona(arrayTrovadores[i]);
-    
-  }
-
+  //array tiempos
   tiempos.length = arrayTrovadores.length;
 
   showVideo();
@@ -385,15 +483,6 @@ function pulsar(event) {
 }
 
 
-function leaveAdd() {
-  
-    var divAgregar = document.getElementById("divAgregar"); 
-    divAgregar.style.display = 'none';
-
-}
-
-
-
 function agregar() {
   var text = document.querySelector('#txtName');
   if (text.value != '')
@@ -477,6 +566,8 @@ function agregar() {
     textoParticipantes.innerHTML = "participantes";
   
 
+    document.getElementById("panelDropdown").style.display = 'none';
+    lblSquad.style.pointerEvents = 'none'; //to disable click
  }
 
  function girar(){
@@ -610,7 +701,8 @@ function agregar() {
             scrumBoard.style.marginLeft =  '1050px';
           }
           else{
-            scrumBoard.style.marginLeft =  '600px';
+            scrumBoard.style.marginLeft =  (window.innerWidth/2)-190+"px";
+            
           }
         }
         
@@ -895,9 +987,8 @@ async function startCapture(displayMediaOptions) {
   let captureStream = null;
 
   try {
-    captureStream = await navigator.mediaDevices.getDisplayMedia(
-      displayMediaOptions
-    );
+   
+    captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
   } catch (err) {
     console.error(`Error: ${err}`);
   }
